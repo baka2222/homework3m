@@ -11,10 +11,16 @@ class Survey(StatesGroup):
     email = State()
 
 
+@survey_rt.message(Command('top', prefix='s'))
+async def stop(msg: types.Message, state: FSMContext):
+    await state.clear()
+
+
 @survey_rt.message(Command('join_team'))
 async def survey(msg: types.Message, state: FSMContext):
     await state.set_state(Survey.name)
     await msg.reply(text='Вы можете присоединиться в команду по озвучке аниме! Для этого пройдите анкету')
+    await msg.answer('Введите <<stop>>, чтобы остановить опрос')
     await msg.answer('Ваше имя?')
 
 @survey_rt.message(Survey.name)
