@@ -9,5 +9,5 @@ async def srs(cb: types.CallbackQuery):
         [types.InlineKeyboardButton(url='https://kinogo.biz/9957-pacany-1-1080.html', text='Пацаны')],
         [types.InlineKeyboardButton(url='https://ctc.ru/projects/serials/kukhnya/', text='Куня')]
     ])
-    cb.message.edit_text('Что предпочтете смотреть?', reply_markup=ikb)
-    cb.answer()
+    await cb.message.edit_text('Что предпочтете смотреть?', reply_markup=ikb)
+    await cb.answer()

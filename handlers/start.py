@@ -14,4 +14,3 @@ async def start(msg: types.Message):
         ])
     await msg.answer(f'Здравствуйте, {msg.from_user.first_name}, Вы попали в бота-поисковика медиатеки!',
                      reply_markup=ikb)
-    types.ReplyKeyboardRemove(remove_keyboard=True)
