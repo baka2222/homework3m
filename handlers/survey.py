@@ -2,6 +2,7 @@ from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
+from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton
 survey_rt = Router()
 
 class Survey(StatesGroup):
@@ -11,16 +12,19 @@ class Survey(StatesGroup):
     email = State()
 
 
-@survey_rt.message(Command('top', prefix='s'))
+@survey_rt.message(Command('stop'))
 async def stop(msg: types.Message, state: FSMContext):
+    kb = ReplyKeyboardRemove()
+    await msg.answer('Опрос присотановлен', reply_markup=kb)
     await state.clear()
 
 
 @survey_rt.message(Command('join_team'))
 async def survey(msg: types.Message, state: FSMContext):
+    kb = ReplyKeyboardMarkup(keyboard = [[KeyboardButton(text='/stop')]])
     await state.set_state(Survey.name)
     await msg.reply(text='Вы можете присоединиться в команду по озвучке аниме! Для этого пройдите анкету')
-    await msg.answer('Введите <<stop>>, чтобы остановить опрос')
+    await msg.answer('Нажмите стоп, чтобы остановить опрос', reply_markup=kb)
     await msg.answer('Ваше имя?')
 
 @survey_rt.message(Survey.name)
