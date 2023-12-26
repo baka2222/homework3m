@@ -1,45 +1,106 @@
-from aiogram import Router, types, F
+from aiogram import types, Router, F
 from aiogram.filters import Command
 import sqlite3
-import pathlib
+from pathlib import Path
 
 
 show_goods_rt = Router()
-db_path = pathlib.Path(__file__).parent.parent / 'goods.db'
-db = sqlite3.connect(db_path)
-cursor = db.cursor()
+
 
 @show_goods_rt.message(Command('goods'))
-async def goods_func(msg: types.Message):
+async def show_goods(msg: types.Message):
+    db_path = Path(__file__).parent.parent / 'goods.db'
+    cursor = sqlite3.connect(db_path).cursor()
+    cursor.execute('SELECT name FROM categories') #Все добавил вручную, потому что через фунции были ошибки
+    data_categories = cursor.fetchall()
+    ikb = types.InlineKeyboardMarkup(inline_keyboard=[
+        [types.InlineKeyboardButton(text=f'{data_categories[0][0]}', callback_data='clothes')],
+        [types.InlineKeyboardButton(text=f'{data_categories[1][0]}', callback_data='stickers')],
+        [types.InlineKeyboardButton(text=f'{data_categories[2][0]}', callback_data='sketchbooks')]
+    ])
+    await msg.answer(text='Вы можете приобрести нашу продукцию! Выберите категорию',
+                     reply_markup=ikb)
+
+
+'''У меня в таблицах по три вещей и категорий, но связь я реализовал'''
+@show_goods_rt.callback_query(F.data == 'sketchbooks')
+async def clothes(callback: types.CallbackQuery):
+    db_path = Path(__file__).parent.parent / 'goods.db'
+    cursor = sqlite3.connect(db_path).cursor()
+    cursor.execute('''SELECT * FROM products AS p
+    JOIN categories AS c ON p.id_categories = c.id''')
+    data_tables = cursor.fetchall()
     ikb = types.InlineKeyboardMarkup(inline_keyboard=[[
-        types.InlineKeyboardButton(text='Скетчбук', callback_data='скетчбук'),
-    ],
-    [
-        types.InlineKeyboardButton(text='Футболка', callback_data='футболка')
+        types.InlineKeyboardButton(text=f'{data_tables[0][1]}', callback_data='Скетчбук Ханако-кун')
     ]])
-    await msg.answer(text='Вы можете купить наш товар!', reply_markup=ikb)
+    await callback.message.edit_text(text=f'Категория - {data_tables[0][7]}.\nВот список товаров',
+                                     reply_markup=ikb)
+    await callback.answer()
 
 
-@show_goods_rt.callback_query(F.data == 'скетчбук')
-async def sketchbook_cb_handler(cb: types.CallbackQuery):
-    cursor.execute('''SELECT * FROM goods WHERE key=5''')
-    show_data = cursor.fetchall()[0]
+'''Дальше создаю коллбек хэндлер для хэндлера, что выше. Итак поочередно'''
+@show_goods_rt.callback_query(F.data == 'Скетчбук Ханако-кун')
+async def hanako_kun(callback: types.CallbackQuery):
+    db_path = Path(__file__).parent.parent / 'goods.db'
+    cursor = sqlite3.connect(db_path).cursor()
+    cursor.execute('''SELECT * FROM products AS p
+        JOIN categories AS c ON p.id_categories = c.id''')
+    data_tables = cursor.fetchall()
+    await callback.message.answer_photo(photo=f'{data_tables[0][4]}',
+                                        caption=f'''{data_tables[0][1]}\n{data_tables[0][3]} Цена {data_tables[0][2]}.''')
+    await callback.answer()
+
+
+@show_goods_rt.callback_query(F.data == 'stickers')
+async def clothes(callback: types.CallbackQuery):
+    db_path = Path(__file__).parent.parent / 'goods.db'
+    cursor = sqlite3.connect(db_path).cursor()
+    cursor.execute('''SELECT * FROM products AS p
+    JOIN categories AS c ON p.id_categories = c.id''')
+    data_tables = cursor.fetchall()
     ikb = types.InlineKeyboardMarkup(inline_keyboard=[[
-        types.InlineKeyboardButton(text='Посмотреть', url=f'https://www.google.com/url?sa=i&url=https%3A%2F%2Fpad-me.ru%2Fsketchbuk-anime%2F&psig=AOvVaw0nQYuH3j_OxGL_2B4JUXl3&ust=1703269784984000&source=images&cd=vfe&opi=89978449&ved=0CBQQ3YkBahcKEwiYsL6xwKGDAxUAAAAAHQAAAAAQAw')
+        types.InlineKeyboardButton(text=f'{data_tables[2][1]}', callback_data='стикеры')
     ]])
-    #Непосредственно с поля png не сумел. edit_media, edit_text, answer_photo - не работали.
-    await cb.message.edit_text(text=f'{show_data[1]}. {show_data[2]}. Цена - {show_data[3]}.', reply_markup=ikb)
-    await cb.answer()
+    await callback.message.edit_text(text=f'Категория - {data_tables[2][7]}.\nВот список товаров',
+                                     reply_markup=ikb)
+    await callback.answer()
 
 
-@show_goods_rt.callback_query(F.data == 'футболка')
-async def sketchbook_cb_handler(cb: types.CallbackQuery):
-    cursor.execute('''SELECT * FROM goods WHERE key=3''')
-    show_data = cursor.fetchall()[0]
+@show_goods_rt.callback_query(F.data == 'стикеры')
+async def hanako_kun(callback: types.CallbackQuery):
+    db_path = Path(__file__).parent.parent / 'goods.db'
+    cursor = sqlite3.connect(db_path).cursor()
+    cursor.execute('''SELECT * FROM products AS p
+        JOIN categories AS c ON p.id_categories = c.id''')
+    data_tables = cursor.fetchall()
+    await callback.message.answer_photo(photo=f'{data_tables[2][4]}',
+                                        caption=f'''{data_tables[2][1]}\n{data_tables[2][3]} Цена {data_tables[2][2]}.''')
+    await callback.answer()
+
+
+@show_goods_rt.callback_query(F.data == 'clothes')
+async def clothes(callback: types.CallbackQuery):
+    db_path = Path(__file__).parent.parent / 'goods.db'
+    cursor = sqlite3.connect(db_path).cursor()
+    cursor.execute('''SELECT * FROM products AS p
+    JOIN categories AS c ON p.id_categories = c.id''')
+    data_tables = cursor.fetchall()
     ikb = types.InlineKeyboardMarkup(inline_keyboard=[[
-        types.InlineKeyboardButton(text='Посмотреть', url=f'https://www.google.com/url?sa=i&url=https%3A%2F%2Fprom.ua%2Fp1641694046-anime-futbolka-yaponskom.html&psig=AOvVaw2FwM1Z7azqXa9v6RbGC8-_&ust=1703285243692000&source=images&cd=vfe&opi=89978449&ved=0CBQQ3YkBahcKEwig-ruSzqGDAxUAAAAAHQAAAAAQAw')
+        types.InlineKeyboardButton(text=f'{data_tables[1][1]}', callback_data='одежда')
     ]])
-    await cb.message.edit_text(text=f'{show_data[1]}. {show_data[2]}. Цена - {show_data[3]}.', reply_markup=ikb)
-    await cb.answer()
+    await callback.message.edit_text(text=f'Категория - {data_tables[1][7]}.\nВот список товаров',
+                                     reply_markup=ikb)
+    await callback.answer()
 
+
+@show_goods_rt.callback_query(F.data == 'одежда')
+async def hanako_kun(callback: types.CallbackQuery):
+    db_path = Path(__file__).parent.parent / 'goods.db'
+    cursor = sqlite3.connect(db_path).cursor()
+    cursor.execute('''SELECT * FROM products AS p
+        JOIN categories AS c ON p.id_categories = c.id''')
+    data_tables = cursor.fetchall()
+    await callback.message.answer_photo(photo=f'{data_tables[1][4]}',
+                                        caption=f'''{data_tables[1][1]}\n{data_tables[1][3]} Цена {data_tables[1][2]}.''')
+    await callback.answer()
 
