@@ -56,7 +56,7 @@ if __name__ == '__main__':
     # create_categories_table()
     # create_products_table()
     # fill_categories()
-    # # fill_products()
+    # fill_products()
     # print(show_data_categories())
 
 
