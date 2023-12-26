@@ -12,6 +12,7 @@ def create_categories_table():
     cursor.execute('''CREATE TABLE IF NOT EXISTS categories(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT)''')
+    db.commit()
 
 
 def create_products_table():
@@ -23,6 +24,7 @@ def create_products_table():
     png TEXT,
     id_categories INTEGER,
     FOREIGN KEY (id_categories) REFERENCES categories(id))''')
+    db.commit()
 
 
 def fill_categories():
@@ -30,6 +32,7 @@ def fill_categories():
     ('clothes'), 
     ('stickers'), 
     ('sketchbooks')''')
+    db.commit()
 
 
 def fill_products():
@@ -40,18 +43,21 @@ def fill_products():
       1),
       ('Аниме наклейки', 100, 'Подойдет для любой вещи!', 'https://ae04.alicdn.com/kf/H132d60b8ea364c47a2115258fe53d700q.jpg',
       2)''')
+    db.commit()
+
+
+def show_data_categories():
+    cursor.execute('SELECT name FROM categories')
+    return cursor.fetchall()[0]
 
 
 if __name__ == '__main__':
     init_db()
-    create_categories_table()
+    # create_categories_table()
     # create_products_table()
-    fill_categories()
-    # fill_products()
-
-
-
-
+    # fill_categories()
+    # # fill_products()
+    # print(show_data_categories())
 
 
 
