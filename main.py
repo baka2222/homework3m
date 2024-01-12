@@ -11,6 +11,7 @@ from handlers.survey import survey_rt
 from handlers.random_message import random_message_rt
 from db.db_functions import init_db
 from handlers.show_goods import show_goods_rt
+from handlers.reminder import reminder_rt
 load_dotenv()
 bot = Bot(token=getenv('BOT'))
 dp = Dispatcher()
@@ -26,6 +27,7 @@ async def main():
         types.BotCommand(command='/join_team', description='Наша команда'),
         types.BotCommand(command='/goods', description='Наши товары')
     ])
+    dp.include_router(reminder_rt)
     dp.include_router(anime_rt)
     dp.include_router(series_rt)
     dp.include_router(info_rt)
