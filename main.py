@@ -12,9 +12,10 @@ from handlers.random_message import random_message_rt
 from db.db_functions import init_db
 from handlers.show_goods import show_goods_rt
 from handlers.reminder import reminder_rt
-load_dotenv()
-bot = Bot(token=getenv('BOT'))
-dp = Dispatcher()
+from bor import bot, dp
+# load_dotenv()
+# bot = Bot(token=getenv('BOT'))
+# dp = Dispatcher()
 
 
 async def on_startup(dispatcher):
